@@ -56,4 +56,4 @@ Ensure you have the `hifast` pipeline installed in your environment.
 
 ## 环境配置
 
-> **⚠️ 注意：** > 请确保你的运行环境中已经成功安装了 `hifast` 管线。
+> **⚠️ 注意：** > 请确保你的运行环境中已经成功安装了 `hifast` 管线以及其他诸如numpy scipy pandas h5py astropy matplotlib等库。
