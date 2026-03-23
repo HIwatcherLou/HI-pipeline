@@ -26,7 +26,7 @@ This toolkit is structured around a standard FAST data reduction and analysis wo
 ### 5. Source Finding Analysis & GAMA Cross-Matching
 * **`source.py`**: Generates spatial distribution plots (RA vs. Dec) of detected HI sources, scaling points by SNR and coloring by frequency.
 * **`check_source.ipynb`**: An interactive tool for quickly scanning 1D spectra (`_spec.txt`) of hundreds of SoFiA-detected sources via a slider interface.
-* **`search.ipynb` (Local GAMA Match)**: An automated high-speed cross-matching tool. It calculates HI redshift ($z_{HI}$) and matches candidates against the **local GAMA DR4 (Galaxy And Mass Assembly)** database using `search_around_sky` spatial indexing, enforcing a strict redshift tolerance ($\Delta z < 0.002$).
+* **`GAMA_search.ipynb` (Local GAMA Match)**: An automated high-speed cross-matching tool. It calculates HI redshift ($z_{HI}$) and matches candidates against the **local GAMA DR4 (Galaxy And Mass Assembly)** database using `search_around_sky` spatial indexing, enforcing a strict redshift tolerance ($\Delta z < 0.002$).
 
 ## Installation & Dependencies
 
