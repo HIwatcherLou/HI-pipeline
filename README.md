@@ -2,35 +2,37 @@
 
 Welcome to the **FAST Data Processing Toolkit**! This repository provides a comprehensive suite of Python scripts and Jupyter Notebooks designed to streamline and enhance the data reduction and analysis workflow for the Five-hundred-meter Aperture Spherical radio Telescope (FAST).
 
-Built to complement the `hifast` pipeline and the `SoFiA` (Source Finding Application) software, these tools cover the entire lifecycle of radio astronomy data processing—from raw FITS data grouping, observation verification, and chunk merging, to final scientific visualization and automated source cross-matching.
+Built to complement the `hifast` pipeline and the `SoFiA` (Source Finding Application) software, these tools cover the entire lifecycle of radio astronomy data processing—from raw FITS data preprocessing to final automated source cross-matching with local galaxy surveys.
 
 ## Workflow & Tool Index
 
 This toolkit is structured around a standard FAST data reduction and analysis workflow:
 
 ### 1. Data Preprocessing & Formatting
-* **`transformation.py`**: Scans raw chunked FITS files, intelligently groups them by Beam ID, sorts them chronologically, and converts them into `hifast`-compatible HDF5 formats.
+* **`transformation.py`**: Scans raw chunked FITS files, intelligently groups them by Beam ID, and converts them into `hifast`-compatible HDF5 formats.
 
 ### 2. Quality Control & Observation Verification
-* **`RA-DEC_total.py`**: Extracts telescope pointing coordinates, filters out unstable slewing periods, and visualizes the actual RA/DEC drift tracking paths to ensure observation accuracy.
-* **`RMS_analysis.py`**: Iterates through FITS datacubes to calculate per-channel RMS noise, automatically flagging anomalous channels (RFI) using a robust statistical threshold.
-* **`path.ipynb`**: A lightweight utility notebook for quickly inspecting FITS header WCS information (e.g., pixel size in degrees/arcminutes) and plotting RA/DEC drift paths directly from intermediate HDF5 files.
+* **`RA-DEC_total.py`**: Visualizes the actual RA/DEC drift tracking paths to ensure observation accuracy.
+* **`RMS_analysis.py`**: Calculates per-channel RMS noise and flags RFI anomalous channels.
+* **`path.ipynb`**: A lightweight notebook for inspecting FITS WCS information and plotting RA/DEC drift paths directly from intermediate HDF5 files.
 
 ### 3. Data Merging
-* **`merge.py`**: Safely concatenates time-chunked HDF5 segments back into continuous, full-beam files. It features dynamic memory resizing and strict preservation of `hifast` soft-links (crucial for Carta compatibility).
+* **`merge.py`**: Safely concatenates time-chunked HDF5 segments into full-beam files while strictly preserving `hifast` soft-links (crucial for **Carta** compatibility).
 
 ### 4. Scientific Visualization & Extraction
-* **`my_analysis.py`**: A smart batch-plotter that uses a 1D convolution algorithm to dynamically locate the "cleanest" continuous time slices, extracting and plotting high-quality mean spectra while bypassing RFI.
-* **`moment0.py`**: Computes 2D Integrated Intensity (Moment 0) maps from 3D FITS datacubes. Fully optimized for headless servers, supporting flexible spectral slicing and advanced visual contrast stretches (Log, Sqrt, Square, Exp).
+* **`my_analysis.py`**: A smart batch-plotter that uses a 1D convolution algorithm to dynamically locate the "cleanest" time slices and extract high-quality spectra.
+* **`moment0.py`**: Computes 2D Integrated Intensity (Moment 0) maps with support for advanced visual contrast stretches (Log, Sqrt, Square, Exp).
 
-### 5. Source Finding Analysis & Cross-Matching (SoFiA Integration)
-* **`source.py`**: Reads SoFiA catalog outputs and generates a spatial distribution scatter plot (RA vs. Dec) of detected HI sources. It dynamically scales point sizes by Signal-to-Noise Ratio (SNR) and colors them by frequency, automatically annotating the top candidates.
-* **`check_source.ipynb`**: An interactive Jupyter Notebook leveraging `ipywidgets` to quickly scan through 1D spectra (`_spec.txt`) of SoFiA-generated cubelets. Perfect for visually verifying the integrated flux of hundreds of sources via a seamless slider interface.
-* **`search.ipynb`**: An automated cross-matching tool. It calculates the HI redshift ($z_{HI}$) for detected sources and queries the NASA/IPAC Extragalactic Database (NED) via `astroquery`. It identifies optical/galaxy matches based on spatial radius and redshift tolerance, outputting a clear Pandas DataFrame summary.
+### 5. Source Finding Analysis & GAMA Cross-Matching
+* **`source.py`**: Generates spatial distribution plots (RA vs. Dec) of detected HI sources, scaling points by SNR and coloring by frequency.
+* **`check_source.ipynb`**: An interactive tool for quickly scanning 1D spectra (`_spec.txt`) of hundreds of SoFiA-detected sources via a slider interface.
+* **`search.ipynb` (Local GAMA Match)**: An automated high-speed cross-matching tool. It calculates HI redshift ($z_{HI}$) and matches candidates against the **local GAMA DR4 (Galaxy And Mass Assembly)** database using `search_around_sky` spatial indexing, enforcing a strict redshift tolerance ($\Delta z < 0.002$).
 
 ## Installation & Dependencies
 
-Ensure you have the `hifast` pipeline installed in your environment. Clone this repository and install the required packages:
+Ensure you have the `hifast` pipeline installed. Then, install the required libraries:
+
+pip install numpy scipy pandas h5py astropy matplotlib ipywidgets notebook
 
 # FAST 射电天文数据处理工具箱 (Project Introduction)
 
@@ -60,8 +62,11 @@ Ensure you have the `hifast` pipeline installed in your environment. Clone this 
 ### 5. 自动寻源分析与交叉匹配 (SoFiA 结果集成)
 * **`source.py`**: 读取 SoFiA 寻源结果目录，绘制空间分布散点图 (RA vs. Dec)。自动根据信噪比 (SNR) 调整点的大小，以颜色映射观测频率，并自动标注出信噪比最高的前 10 个候选源。
 * **`check_source.ipynb`**: 基于 `ipywidgets` 的交互式 Jupyter Notebook，用于快速浏览 SoFiA 生成的每一个源的 1D 频谱 (`_spec.txt`)。通过拖动滑动条即可无缝切换查看数百个源的积分通量，极大提升人工核查效率。
-* **`search.ipynb`**: 自动化数据库交叉匹配工具。根据观测频率计算中性氢红移 ($z_{HI}$)，利用 `astroquery` 模块自动批量连接 NED (NASA/IPAC Extragalactic Database) 数据库。在指定的搜索半径和红移误差范围内寻找对应天体，并输出直观的匹配结果汇总表。
+* **`GAMA_search.ipynb`**: 自动化数据库交叉匹配工具。根据观测频率计算中性氢红移 ($z_{HI}$)，自动批量连接本地GAMA DR4 数据库。在指定的搜索半径和红移误差范围内寻找对应天体，并输出直观的匹配结果汇总表。
 
 ## 环境配置
 
 > **⚠️ 注意：** > 请确保你的运行环境中已经成功安装了 `hifast` 管线以及其他诸如numpy scipy pandas h5py astropy matplotlib等库。
+> 在使用交叉匹配脚本 (GAMA_search.ipynb) 之前，你必须预先下载 GAMA DR4 光谱天体表。
+下载地址： [GAMA Survey DR4 官方入口](http://www.gama-survey.org/dr4/)
+配置说明： 请将脚本中 gama_local_path 变量的值修改为你本地 CSV 文件的存储路径。
