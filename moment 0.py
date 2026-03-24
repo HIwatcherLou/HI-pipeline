@@ -1,5 +1,6 @@
 import matplotlib
 matplotlib.use('Agg')  # 强制使用无头模式，解决服务器报错
+
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors 
@@ -13,11 +14,6 @@ import sys
 
 warnings.filterwarnings('ignore')
 
-# 文件配置
-DEFAULT_INPUT = 'loujc_work/cube/GAMA/1300-1350/Dec-0011_09_05_arcdrift/Dec-0011_09_05_arcdrift-gaussian.fits'
-COLORMAP = 'inferno'   
-BACKGROUND_COLOR = "#FFFFFF" 
-
 class CustomExpNorm(mcolors.Normalize):
     def __init__(self, a, vmin=None, vmax=None, clip=False):
         self.a = a
@@ -29,17 +25,25 @@ class CustomExpNorm(mcolors.Normalize):
         return (np.ma.power(self.a, x) - 1) / (self.a - 1)
 
 def get_args():
-    parser = argparse.ArgumentParser(description="生成 Moment 0，支持指定频率范围或通道范围")
-    parser.add_argument('-f', '--file', type=str, default=DEFAULT_INPUT, help='输入 FITS 文件路径')
+    parser = argparse.ArgumentParser(description="生成 Moment 0 图像，支持指定频率/通道范围、视觉拉伸及自定义配色")
     
+    # 输入与输出路径配置
+    parser.add_argument('-i', '--indir', type=str, required=True, help='输入 FITS 文件路径')
+    parser.add_argument('-o', '--outdir', type=str, required=True, help='输出目录路径')
+    
+    # 颜色与背景配置
+    parser.add_argument('--cmap', type=str, default='inferno', help='颜色映射 (默认: inferno，可选 viridis, plasma, gray 等)')
+    parser.add_argument('--bg', type=str, default='#FFFFFF', help='NaN/无效数据的背景颜色 (默认: #FFFFFF 白色)')
+
     # 频率范围参数 (单位 MHz)
     parser.add_argument('--freq', type=float, nargs=2, metavar=('START', 'END'), 
                         help='指定频率范围 (单位: MHz)，例如 --freq 1420.1 1420.8')
     
-    # 【新增】通道范围参数
+    # 通道范围参数
     parser.add_argument('-c', '--channel', type=int, nargs=2, metavar=('START', 'END'),
                         help='指定通道索引范围 (整数)，例如 --channel 100 200')
 
+    # 视觉拉伸参数组
     group = parser.add_mutually_exclusive_group()
     group.add_argument('--log', action='store_true', help='使用对数 (Log) 视觉拉伸')
     group.add_argument('--sqrt', action='store_true', help='使用开方 (Sqrt) 视觉拉伸')
@@ -50,7 +54,8 @@ def get_args():
 
 def run_clean_plot():
     args = get_args()
-    input_fits_file = args.file
+    input_fits_file = args.indir
+    output_dir = args.outdir
     
     # 1. 读取数据
     try:
@@ -133,11 +138,9 @@ def run_clean_plot():
             traceback.print_exc()
 
     # 3. 自动生成输出路径
-    base_dir = os.path.dirname(input_fits_file)
     base_name = os.path.basename(input_fits_file)
     name_no_ext = os.path.splitext(base_name)[0]
     
-    output_dir = os.path.join(base_dir, 'moment0')
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
         
@@ -223,8 +226,9 @@ def run_clean_plot():
     fig = plt.figure(figsize=(10, 8))
     ax = fig.add_subplot(111, projection=wcs_2d)
 
-    cmap = copy.copy(plt.get_cmap(COLORMAP))
-    cmap.set_bad(color=BACKGROUND_COLOR) 
+    # 动态应用用户设置的颜色映射和背景色
+    cmap = copy.copy(plt.get_cmap(args.cmap))
+    cmap.set_bad(color=args.bg) 
 
     im = ax.imshow(moment0_data, cmap=cmap, norm=norm, origin='lower', interpolation='nearest')
 
