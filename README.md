@@ -15,7 +15,7 @@ This toolkit is structured around a standard FAST data reduction and analysis wo
 * **`RA-DEC_total.py`**: Visualizes the actual RA/DEC drift tracking paths to ensure observation accuracy.
 * **`RMS_analysis.py`**: Calculates per-channel RMS noise and flags RFI anomalous channels.
 * **`path.ipynb`**: A lightweight notebook for inspecting FITS WCS information and plotting RA/DEC drift paths directly from intermediate HDF5 files.
-
+* **`RA-DEC-RMS.py`**: Calculates the **spatial** distribution of RMS noise across the FITS datacube. It generates 2D noise maps in RA/Dec coordinates, helping to identify direction-dependent interference or beam edge effects.
 ### 3. Data Merging
 * **`merge.py`**: Safely concatenates time-chunked HDF5 segments into full-beam files while strictly preserving `hifast` soft-links (crucial for **Carta** compatibility).
 
@@ -51,6 +51,7 @@ pip install numpy scipy pandas h5py astropy matplotlib ipywidgets notebook
 * **`RA-DEC_total.py`**: 提取望远镜指向数据，智能剔除转场或不稳定的扫描片段，将实际的 RA/DEC 漂移轨迹合并绘制在同一张高对比度图表中。
 * **`RMS_analysis.py`**: 遍历 FITS 数据立方体计算逐通道的均方根 (RMS) 噪声，并利用统计阈值自动检测和标记受射频干扰 (RFI) 污染的异常通道。
 * **`path.ipynb`**: 轻量级实用工具本。用于快速检查 FITS 头文件中的 WCS 像素尺度（度/角分），并支持直接从 HDF5 过程文件中提取和绘制 RA/DEC 实际指向轨迹。
+* **`RA-DEC-RMS.py`**: 计算 FITS 数据立方体的空间 RMS 噪声分布。生成基于 RA/Dec 坐标的 2D 噪声图，用于识别与方向相关的干扰或波束边缘效应。
 
 ### 3. 分块数据合并
 * **`merge.py`**: 将分块处理后的 HDF5 切片安全、无损地拼接回完整的单波束文件。支持动态扩容写入，并完美保留软链接（这对 Carta 等高级可视化软件至关重要）。
